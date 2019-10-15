@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:coreEntry>
+        <con:binding type="SOAP" isSoap12="false" xsi:type="con:SoapBindingType">
+            <con:wsdl ref="INT_OSB_ProductManagement/ConsultarDominiosEmail/EXP/Specification/Expose/WSDL/EXP_ConsultarDominiosEmail"/>
+            <con:binding>
+                <con:name>ConsultarDominiosEmail_binding</con:name>
+                <con:namespace>ar.com.cablevision.osb.ProductManagement.ConsultarDominiosEmail</con:namespace>
+            </con:binding>
+        </con:binding>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:template-overrides>
+            <con:action-override id="_ActionId-N3f574d3d.N24ab97ad.0.15ebf2ff759.N789c">
+                <con1:replace xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+                    <con1:expr>
+                        <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">compm:getParameter('ESB_BUSINESS_ENTITY_COMPONENT_ID')</con2:xqueryText>
+                    </con1:expr>
+                </con1:replace>
+            </con:action-override>
+            <con:action-override id="_ActionId-N3f574d3d.N24ab97ad.0.15ebf2ff759.N78a2">
+                <con1:replace xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+                    <con1:expr>
+                        <con2:xqueryText xmlns:con2="http://www.bea.com/wli/sb/stages/config">xs:string($body/ar:ConsultarDominiosEmail/ar:componentId)</con2:xqueryText>
+                    </con1:expr>
+                </con1:replace>
+            </con:action-override>
+            <con:stage-override id="_StageId-N3f574d3d.N24ab97ad.0.15ebf2ff759.N78a5">
+                <con:context>
+                    <con1:userNsDecl prefix="cc" namespace="ar.cablevision.com.ar.ProductManagement.OTTCustomer" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+                    <con1:userNsDecl prefix="ar" namespace="ar.com.cablevision.ProductManagement.ConsultarDominiosEmail" xmlns:con1="http://www.bea.com/wli/sb/stages/config"/>
+                </con:context>
+            </con:stage-override>
+            <con:template-branch-override id="_FlowId-N53ef3d7f.N50de3975.0.1579745fde1.N7f6d">
+                <con:branch-node>
+                    <con:branch-table>
+                        <con:branch name="ConsultarDominiosEmail">
+                            <con:operator>equals</con:operator>
+                            <con:value/>
+                            <con:template-overrides>
+                                <con:action-override id="_ActionId-N53ef3d7f.N50de3975.0.1579745fde1.N7e63">
+                                    <con1:validate xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+                                        <con1:schema ref="INT_OSB_ProductManagement/ConsultarDominiosEmail/EXP/Specification/Expose/XSD/EXP_ConsultarDominiosEmail"/>
+                                        <con1:schemaElement xmlns:ar="ar.com.cablevision.ProductManagement.ConsultarDominiosEmail">ar:ConsultarDominiosEmail</con1:schemaElement>
+                                    </con1:validate>
+                                </con:action-override>
+                                <con:placeholder-override id="PlaceholderID_N3f577a7e.59aebd30.0.15798e330b1.N997d">
+                                    <con:actions/>
+                                </con:placeholder-override>
+                                <con:placeholder-override id="PlaceholderID_N53ef3d7f.N50de3975.0.1579745fde1.N7e5d">
+                                    <con:actions/>
+                                </con:placeholder-override>
+                                <con:placeholder-override id="PlaceholderID_N53ef3d7f.N50de3975.0.1579745fde1.N7d19">
+                                    <con:actions/>
+                                </con:placeholder-override>
+                                <con:action-override id="_ActionId-N3f577a7e.59aebd30.0.15798e330b1.N7650">
+                                    <con1:validate xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+                                        <con1:schema ref="INT_OSB_ProductManagement/ConsultarDominiosEmail/EXP/Specification/Expose/XSD/EXP_ConsultarDominiosEmail"/>
+                                        <con1:schemaElement xmlns:ar="ar.com.cablevision.ProductManagement.ConsultarDominiosEmail">ar:ConsultarDominiosEmailResponse</con1:schemaElement>
+                                    </con1:validate>
+                                </con:action-override>
+                                <con:placeholder-override id="PlaceholderID_N3f577a7e.59aebd30.0.15798e330b1.N7b4b">
+                                    <con:actions/>
+                                </con:placeholder-override>
+                                <con:placeholder-override id="PlaceholderID_N53ef3d73.N69fbe1b1.0.159eb88e059.N7ef0">
+                                    <con:actions/>
+                                </con:placeholder-override>
+                                <con:action-override id="_ActionId-N53ef3d7f.N50de3975.0.1579745fde1.N7e6e">
+                                    <con1:route xmlns:con1="http://www.bea.com/wli/sb/stages/routing/config">
+                                        <con1:service ref="INT_OSB_ProductManagement/ConsultarDominiosEmail/LIN/ProxyServices/LIN_ConsultarDominiosEmail" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                                        <con1:operation>ConsultarDominiosEmail</con1:operation>
+                                    </con1:route>
+                                </con:action-override>
+                            </con:template-overrides>
+                        </con:branch>
+                        <con:default-branch>
+                            <con:template-overrides/>
+                        </con:default-branch>
+                    </con:branch-table>
+                </con:branch-node>
+            </con:template-branch-override>
+            <con:placeholder-override id="PlaceholderID_N53ef3d70.2eb6529f.0.159affe99fe.N7d48">
+                <con:actions/>
+            </con:placeholder-override>
+            <con:placeholder-override id="PlaceholderID_N3f577a7e.34a216a9.0.15809b12278.N7d6e">
+                <con:actions/>
+            </con:placeholder-override>
+            <con:placeholder-override id="PlaceholderID_N3f5757ea.5ce1c52b.0.162f7dd2abc.N7b2d">
+                <con:actions/>
+            </con:placeholder-override>
+        </con:template-overrides>
+    </con:router>
+    <con:template ref="CMP-OSB-Templates/EXP/PipelineTemplates/GenericPipeline_EXP_1.13"/>
+</con:pipelineEntry>

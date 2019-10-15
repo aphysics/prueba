@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="ar.com.cablevision.ProductManagement.EXP_ConsultarDominiosEmail"
+            targetNamespace="ar.com.cablevision.ProductManagement.EXP_ConsultarDominiosEmail"
+            elementFormDefault="qualified">
+  <xsd:element name="ConsultarDominiosEmailRequest">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="productId" type="xsd:integer" minOccurs="1" nillable="false"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="ConsultarDominiosEmailResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="datosDominiosEmails" minOccurs="1" maxOccurs="1">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="datoDominiosEmails" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                  <xsd:sequence>
+                    <xsd:element name="nombreDominio"     type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+                    <xsd:element name="prefijo"           type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+                    <xsd:element name="idDominioEmail"    type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+                    <xsd:element name="esDominioDefault"  type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"/>
+                  </xsd:sequence>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

@@ -1,0 +1,51 @@
+<wsdl:definitions name="EXP_ConsultarDominiosEmail"
+                  targetNamespace="ar.com.cablevision.osb.ProductManagement.EXP_ConsultarDominiosEmail"
+                  xmlns:tns="ar.com.cablevision.osb.ProductManagement.EXP_ConsultarDominiosEmail"
+                  xmlns:ip="ar.com.cablevision.ProductManagement.EXP_ConsultarDominiosEmail"
+                  xmlns:req-header="ar.com.cablevision.common.RequestHeader"
+                  xmlns:res-header="ar.com.cablevision.common.ResponseHeader"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema>
+      <xsd:import namespace="ar.com.cablevision.ProductManagement.EXP_ConsultarDominiosEmail"
+                  schemaLocation="../XSD/EXP_ConsultarDominiosEmail.xsd"/>
+      <xsd:import namespace="ar.com.cablevision.common.RequestHeader"
+                  schemaLocation="../../../../../../CMP-OSB-Common/Specification/xsd/requestHeader.xsd"/>
+      <xsd:import namespace="ar.com.cablevision.common.ResponseHeader"
+                  schemaLocation="../../../../../../CMP-OSB-Common/Specification/xsd/responseHeader.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="requestHeader">
+    <wsdl:part name="requestHeader" element="req-header:requestHeader"/>
+  </wsdl:message>
+  <wsdl:message name="responseHeader">
+    <wsdl:part name="responseHeader" element="res-header:responseHeader"/>
+  </wsdl:message>
+  <wsdl:message name="requestMessage">
+    <wsdl:part name="request" element="ip:ConsultarDominiosEmailRequest"/>
+  </wsdl:message>
+  <wsdl:message name="replyMessage">
+    <wsdl:part name="reply" element="ip:ConsultarDominiosEmailResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="ConsultarDominiosEmail_ptt">
+    <wsdl:operation name="ConsultarDominiosEmail">
+      <wsdl:input message="tns:requestMessage"/>
+      <wsdl:output message="tns:replyMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ConsultarDominiosEmail_binding" type="tns:ConsultarDominiosEmail_ptt">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ConsultarDominiosEmail">
+      <soap:operation style="document" soapAction="ConsultarDominiosEmail"/>
+      <wsdl:input>
+        <soap:header use="literal" message="tns:requestHeader" part="requestHeader"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header use="literal" message="tns:responseHeader" part="responseHeader"/>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+</wsdl:definitions>
