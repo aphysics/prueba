@@ -1,0 +1,823 @@
+#
+# SCCS ID: @(#) solutions/camposfm 1.1 99/01/20 23:22:17
+#
+# name				number	type	flags	comments
+#
+# Datos Control
+*base 10
+
+#
+# Parametros Generales (Utilizados por todas las transacciones)
+PID							1	long	-	PID del Proceso Cliente
+COD_OPER					2	long	-	Código de Operación  
+SNCODE						3	long	-   -
+TTCODE						4	long	-   -
+RESULTADO					5	long   -   Resultado de la TRansacción
+
+#
+# Fecha oficial de BNPAIS, en formato Oracle deseado  
+FECHA_FMT					6	string	-	Formato Fecha
+FECHA_BNPAIS					7	string	-	Fecha BNPAIS
+FECHA_COMP					8	string	-	Fecha en formato YYYYMMDD
+
+
+#
+# Variables para manejo de Errores
+CODE_ERROR					21	long	-	-
+DESC_ERROR					22	string	-	-
+ID_ERROR					23	long	-	-
+
+*base 100
+#
+# Información sobre el cliente
+NUM_LINEA					1	string  -	Numero de linea telefonica
+NUM_CONTRATO					2	long	-	Numero de contrato del cliente
+CUSTOMER_ID					3	long	-	Numero de cliente del contrato
+CUSTOMER_ID_RESP				4	long	-	Usuario cliente Responsable de pagos
+SUSPENDIDO					5	long	-	Reportes de suspencion 
+NUM_LINEA_DEST					6	string	-	Número de Línea Destino
+CUSTCODE					7	string	-	Custcode
+CUSTCODE_RESP				8	string	-	Custcode Responsable
+
+*base 200
+#
+# Información sobre Servicios
+SERVICIOS					1	string  -   Informa Servicios asociados al contrato
+VECTOR_SERV					2	string	-	Vector de Servicios IVR
+TIPO_CAS					3	long    -   -
+TECNOLOGIA					4	string  -   -
+IND_AUTOCONSULTA				5	long   	-   Indicador de si puede o no realizar AutoConsulta
+IND_AUTOGESTION					6	long   	-   Indicador de si puede o no realizar AutoGestion - Revisar
+IND_AFACIL					7	long   	-   Indicador de si puede acceder a * Facil - Revisar
+IND_PFACT					8	long   	-   Indicador de si puede o no Pagar Factura con TC - Revisar
+NUM_MIN						9	string  -   -   
+BANDA_CODE					10	long	-   Anterior SNCODE 040330
+TIPO_LINEA					12	string	-   1=Prepago 2=Postpago 3=MIX
+LINEA_GSM					13	long	-	Indica que es linea GSM
+SERVICIO_TAF					14	long	-   Si tiene contratado Servicio Grupo Personal
+LAST_CS_STAT_CHNG				15	string	-	Ultima fecha de cambio de Estado del Servicio Formato YYYYMMDD
+
+*base 250
+#
+# Información sobre consumos
+NUM_CUENTA					1	long	-   -
+DIGITO_VERIFICADOR				2	string	-	-
+ESTADO_CUENTA					3	float	-   -
+FECHA_EST_CUENTA				4	string  -   -
+CONSUMO_HP					5	long    -   Unidades disponibles en Hora Pico
+CONSUMO_HNP					6	long    -   Unidades disponibles en Hora No Pico
+CONSUMO_SDF					7	long    -   Unidades disponibles Sabado-Domingo y Feriados
+CONSUMO_BU					8	long    -   Unidades disponibles en Banda Unica
+DISPONIBLE_TAF					9	long	-   Unidades disponibles en Servicio Grupo Personal
+RESTANTE_TAF					10	long	-   Unidades que restan por consumir en Servicio Grupo Personal
+VALOR_DOLAR					11	float   -   -
+FECHA_VTO					12	string  -   -
+FECHA_CIERRE					13	string  -   -
+LIMITE_CREDITO					14	float   -   -
+LIMITE_DISPONIBLE				15	float   -   -
+CONSUM_MTO					16	float   -   Consumo de la Cuenta
+FACT_PESOS					17	float   -   -
+FECHA_ULT_FACT					18	string  -   -
+MONTO_MINIMO					19	float	-   -
+MONTO_MAXIMO					20	float	-   -
+MONTO_ADEUDADO					21	float	-   -
+MONTO_EXCEDENTE					22	float	-   Monto que excede el Limite de Credito
+EXCE_CONSUMO_VALORIZADO				23	float   -	-
+EXCE_IMPUESTOS					24	float   -	-
+SUMA_PAGOS_ADICIONALES				25	float   -	-
+ACUM_FUOMD					26	long    -	-
+ACUM_FUOMC					27	long    -	-
+MARCA_PLAN_PTFO					28	string  -   Marca si es linea con plan PTFO
+
+*base 300
+#
+# Información sobre Abono
+ABONO_DIFERENCIAL			1	long   	-   Si posee abono diferencial
+MIN_ABONO_HP				2	long    -   -
+MIN_ABONO_HNP				3	long    -   -
+MIN_ABONO_SDF				4	long    -   -
+MIN_ABONO_BU				5	long    -   -
+MIN_LIBRES				6	long    -   -
+PULSOS_LOCALES				7	long    -   -
+PULSOS_DDN				8	long    -   -
+PULSOS_DDI				9	long    -   -
+
+*base 350
+#
+# Consulta y Cambio de Pin
+PIN					1	string	-	Clave de la linea almacenado
+PIN_IN					2	string	-	Clave de la linea ingresado por el cliente
+COD_SIST				3	string	-	Código de Sistema (Utilizado en Data Dependent Routing)
+PIN_NEW					4	string	-	Nueva clave para asignar a la línea.
+ID_LLAMADA              		5   	string  -   	Id de llamada del IVR. 
+
+*base 400
+#
+# Parámetros GMD
+GMD_OPCION				1	long	-	Tipo de Operación a realizar
+GMD_REQUEST_ID				2	long	-	Número de requerimiento insertado
+
+*base 600
+#
+# Variables Auditoria
+AUDIT_ID				1	long	-	-
+AUDIT_PROCESS_ID			2	long	-	-
+AUDIT_PROCESS_STATUS			3	string	-	-
+AUDIT_CODE_INFO				4	string	-	-
+AUDIT_EVENT_DESCR			5	string	-	-
+
+
+*base 700
+# Interfaz para operaciones sobre Tarjetas Credito
+# Datos de la Tarjeta
+NUM_TARJETA				1	string	-	-
+CODIGO_SEGURIDAD			2	string	-	-
+FECHA_VTO_TARJETA			3	string	-	-
+BANK_CODE				4	string	-	-
+
+#
+#Datos WonderSOft
+
+NUMERO_TICKET				5	string	-	-
+COD_AUTORIZACION			6	string	-	-
+RESULTADO_SUTC				7	string	-	-
+VISOR					8	string	-	-
+
+#
+#Datos de pago
+FECHA_DE_PAGO				9	string	-	-
+IMPORTE					10	float	-	-
+
+#
+# Datos Tramite de extencion limite de credito Personal
+
+PORCINC					11	float	-	-
+LIMITE_CREDITO_DEFAULT			12	float	-	Importe default limite del cliente		
+LIMITE_CREDITO_ACTUAL			13	float	-	Importe LimiteReal mas Adicional
+LIMITE_CREDITO_REAL			14	float	-	-
+IMPORTE_EXT_LIM_CRED			15	float	-	Importe de extencion de limite
+
+# Otros Importes
+IMPORTE_ACTUALIZADO			16	float	-	Importe Actualizado
+
+#
+# Datos de imputacion en BNPAIS 
+FECHA_DE_IMPUTACION			20	string	-	Fecha de imputacion del pago
+PAGOS_PENDIENTES_IMPUTAR		21	long	-	Se tienen pagos pendientes por imputar
+
+#
+# Datos para validación de Suspensiones 
+TIPO_VAL_SUSP				22	long	-	Indicador Tipo de Validación de Suspensiones
+SNCODES_SUSP				23	long	-	SNCODES de suspensiones a validar
+CONVIVE_SNCODE				24	long	-	Flag Convivencia de Servicios. 0 -> Convive >1 -> No Convive
+
+# Datos para encriptar/desencriptar tarjetas de credito
+NUM_TARJETA_ENC				25	string	-	Numero de TC encriptado
+
+
+# Parametros de configuracion de transacciones, usados por el servidor de configuracion
+*base 800
+CFG_COD_TRAN				1	string	-	-
+CFG_SUB_COD				2	string	-	-
+CFG_MONEDA    				3	long	-	-
+CFG_CUOTAS    				4	long	-	-
+CFG_INGRESO   				5	long	-	-
+CFG_TIPO_OPER    			6	long	-	-
+CFG_ANULACION 				7	string	-	-
+CFG_COBRANZA				8	string	-	-
+CFG_TIPO_PAGO				10	string	-	-
+CFG_COD_MOV				11	string	-	-
+
+# Constantes de Servicios Asociados a Suspensiones a Validar
+CFG_SUSP_1					12	string	-	Extensión de límite de crédito
+CFG_SUSP_2					13	string	-	Siniestro 
+CFG_SUSP_3					14	string	-	Transferencia de Crédito
+CFG_SUSP_4					15	string	-	Informa Pago
+CFG_SUSP_5					16	string	-	A Definir
+CFG_SUSP_6					17	string	-	A Definir
+CFG_SUSP_7					18	string	-	A Definir
+CFG_SUSP_8					19	string	-	A Definir
+CFG_SUSP_9					20	string	-	A Definir
+CFG_SUSP_10					21	string	-	A Definir
+
+CFG_IPADDR					50	string	-	-
+CFG_PORT					51	long	-	-
+CFG_TXNAME					52	string	-	-
+
+CFG_IMPORTE_20					60	float	-	TR Cred Importe sin impuestos equivalente a $20
+CFG_IMPORTE_30					61	float	-	TR Cred Importe sin impuestos equivalente a $30
+CFG_IMPORTE_40					62	float	-	TR Cred Importe sin impuestos equivalente a $40
+
+CFG_ANTIG_MINIMA_LO				63	long	-	TR Cred Importe Antiguedad mínima Linea Origen
+CFG_MAX_SUM_TRCRED				64	float	-	TR Cred Importe Monto Maximo Diario
+CFG_IMPORTE_MIN_LC				65	float	-	Importe Mínimo disponible del Límite de Crédito
+CFG_SNCODE_TRCRED				66	long	-	Código del servicio de Transferencia de Crédito
+CFG_IMPORTE_50					67	float	-	TR Cred Importe sin impuestos equivalente a $50
+
+# Parametros VANTIVE
+*base 900
+VAN_CONTACT_ID					1	long	-	Numero de contacto Vantive
+VAN_CASE_ID					2	long	-	Numero de caso Vantive
+VAN_PORCE_EXCEDENTE				4	float	-	-
+VAN_FECHA_CASO					5	string	-	Fecha de caso vantive
+VAN_TIPIFICACION				6	string	-	Tipificación Vantive	
+
+VAN_COMMENT					8	string	-	Comentario
+VAN_DATOS_ADD					9	string	-	Datos Adicionales
+VAN_IDAREADEST					10	long	-	ID Area Destino
+VAN_USER					11	string	-	Usuario Vantive
+VAN_CONTACTO					12	string	-	Tipo de Contacto Vantive
+VAN_ESTADO					13	string	-	Estado del Caso Vantive
+VAN_DATOS_PART					14	string	-	Datos Particulares del Caso
+VAN_FLG_VANTRAN					15	long	-	Flag VA_CLI_TRAN_VANT_TRANS
+CANT_VANTRAN_PEND				16	long	-	Cantidad de Registros Pendientes en VANTRANS
+
+# Parametros MGTP
+*base 1000
+SALDO_ACTUAL					1	float	-	Saldo Actual
+SALDO_CONG					2	float	-	Saldo Congelado
+PLAN						3	long	-	Plan
+FECHA_VIGENCIA					4	string	-	Fecha desde la cual se encuentra vigente el plan
+DIAS_VIG					5	long	-	Es igual a Fecha Actual - Fecha de Vigencia
+FECHA_EXP					6	string	-	Fecha de Expiración del Saldo
+DIAS_EXP					7	long	-	Dias que restan para la expiración
+FECHA_ZB2					8	string	-	Fecha en que pasa a ZB2
+DIAS_ZB2					9	long	-	Dias que restan para ZB2
+FECHA_COOLING					10	string	-	Fecha en que pasa a Cooling
+DIAS_COOL					11	long	-	Dias que restan para pasar a cooling
+BONUS						12	long	-	Bonus por continuidad
+ESTADO_PRE					13	long	-	Estado Actual de la linea Pre Pago
+NUM_TARJETA_PRE					14	string	-	Numero de Tarjeta Pre Pago
+TIPO_PRE					15	string	-	TIPO devuelto en consulta de Tarjeta
+FECHA_ESTADO					16	string	-	Fecha estado
+ESTADO_TARJETA					17	string	-	Fecha estado
+MOTIVO						18	long	-	Motivo Recarga/Ajuste de saldo
+MGTP_DESC_ERROR					19	string	-	Descripcion de error MGTP
+MGTP_ID_ERROR					20	string	-	Identificador de error MGTP
+
+# Parámetros OCC
+*base 1100
+USE_AMOUNT					1	long	-	Indica si se utiliza o no el importe ingresado en la OCC
+SPCODE_OCC					2	long	-	Service Pack Code
+SNCODE_OCC					3	long	-	Service Name Code
+FEE_TYPE					4	string	-	Tipo de Cargo: R Regular N Unica vez
+PERIOD						5	long	-	Períodos en meses
+REASON_ID					6	long	-	Foreing key a reasonstatus_all
+REMARK						7	string	-	Descripción de la OCC
+TICKLER						8	long	-	Indica si se genera o no tickler (Auditoria)
+CASE_ID_OCC					9	string	-	Vantive Case para OCC  (string)
+
+# Parámetros para Transferencia de Crédito
+*base 1150
+CTO_ANTIGUEDAD					1	long	-	Antiguedad del contrato desde su activación
+SUM_TRCRED					2	float	-	Suma del Importe de las Trans de Credito realizadas en el día
+
+
+# Campos Adicionales Transaccion IPago
+*base 1200
+CANT_IPAGOS_PEND			1	long	-	Cantidad de IPagos pendientes de los £ltimos 30 d¡as
+REGION						2	long   -   Región de la que proviene el llamado
+CARGO						3	string	-	Indica si se debe cobrar cargo por reconexión (S=Si, N=No)
+MARCA_REAB_MORA             4   string  - Indica si se debe posee de marca de no reabilitacion por mora(S=Si, N=No)
+
+# Campos Adicionales Suspension por Siniestro
+*base 1250
+TIPO_SINI					1	string	-	Tipo de Siniestro
+TEL_CONTACTO					2	string	-	Teléfono del Contacto
+
+# Campos para Recambio Tecnologico
+*base 1300
+NUM_DOCUM					1	string	-	Numero de Documento
+TIPO_DOCUM					2	long	-	Tipo de Documento
+TIPO_PERSONA					3	string	-	Tipo de Persona
+NOMB_USUARIO					4	string	-	Nombre Usuario
+APELL_USUARIO					5	string	-	Nombre Usuario
+EMAIL_USUARIO					6	string	-	Mail Electronico
+DIR_NOM_USUARIO					7	string	-	Nombre de la direccion
+DIR_NUM_USUARIO					8	string	-	Numero de la direccion
+DIR_DEPTO_USUARIO				9	string	-	Piso y Depto.
+LOCALIDAD_USUARIO				10	string	-	Localidad
+COD_POSTAL_USUARIO				11	string	-	Codigo Postal
+NOMB_TITULAR					12	string	-	Nombre Usuario
+APELL_TITULAR					13	string	-	Nombre Usuario
+EMAIL_TITULAR					14	string	-	Mail Electronico
+DIR_NOM_TITULAR					15	string	-	Nombre de la direccion
+DIR_NUM_TITULAR					16	string	-	Numero de la direccion
+DIR_DEPTO_TITULAR				17	string	-	Piso y Depto.
+LOCALIDAD_TITULAR				18	string	-	Localidad
+COD_POSTAL_TITULAR				19	string	-	Codigo Postal
+SEGM_CATE					20	string	-	Categoria del Segmento
+SEGM_ID						21	long	-	Identificador de Segmento
+SEGM_TIPO					22	long	-	Tipo de Segmento
+SEGM_DESC					23	string	-	Descripcion del Segmento
+CLUB_PERSONAL					24	long	-	1:Tiene Club Pers. 0:No tiene Club Pers.
+CANT_LINEAS_CUIT				25	long	-	Cant. de lineas asociadas a un CUIT
+COD_PROMOCION					26	string	-	Codigo de Promocion para Descuento Rec. Tec.
+FEC_VIG_PROMO					27	string	- 	Fecha de vigencia de la promocion Rec.Tec.
+CCSEQ						28	long	- 	Secuencia 
+
+# Campo de intercambio entre Daemon y Transformer para Tranferencia de Credito
+TX_STR						50	string	-	String de intercambio
+
+# Campo para intercambio con el cache generico
+STR_IN						51	string	-	-
+LONG_IN						52	long	-	-		
+STR_OUT						53	string	-	-
+LONG_OUT					54	long	-	-
+
+# Campos para Consulta de Abonos y Planes
+*base 1400
+ABONO_SHDES					1	string	-	- 
+
+
+ABONO_TM_CODE					4	long	-	-
+ABONO_VS_CODE					5	long	-	-
+
+ABONO_HUBO_AUMENTO				12 	string	-	-
+ABONO_TIENE_ABONO_DIF				13	string	-	-
+ABONO_ABONO_ACTUAL 				14	string	-	-
+
+ABONO_MINUTO_HP_ACTUAL				15	string	-	-
+ABONO_MINUTO_HNP_ACTUAL				16	string	-	-
+ABONO_MINUTO_SDF_ACTUAL 			17	string	-	-
+ABONO_MINUTO_NOC_ACTUAL 			18	string	-	-
+ABONO_MINUTO_FLAT_ACTUAL			19	string	-	-
+
+ABONO_MIN_LIBRE_HP_ACTUAL			20	string	-	-
+ABONO_MIN_LIBRE_HNP_ACTUAL			21	string	-	-
+ABONO_MIN_LIBRE_SDF_ACTUAL			22	string	-	-
+ABONO_MIN_LIBRE_NOC_ACTUAL			23	string	-	-
+ABONO_MIN_LIBRE_FLAT_ACTUAL			24	string	-	-
+
+ABONO_ABONO_FUTURO				26	string	-	-
+
+ABONO_MINUTO_HP_FUTURO				27	string	- 	normal
+ABONO_MINUTO_HNP_FUTURO				28	string  - 	reducida 
+ABONO_MINUTO_SDF_FUTURO				29	string  - 	sabados domingos y feriados
+ABONO_MINUTO_NOC_FUTURO				30	string	- 	flat
+ABONO_MINUTO_FLAT_FUTURO			31	string  - 	nocturna
+
+ABONO_MIN_LIBRE_HP_FUTURO			32	string	-	-
+ABONO_MIN_LIBRE_HNP_FUTURO			33	string	-	-
+ABONO_MIN_LIBRE_SDF_FUTURO			34	string	-	-
+ABONO_MIN_LIBRE_NOC_FUTURO			35	string	-	-
+ABONO_MIN_LIBRE_FLAT_FUTURO			36	string	-	-
+
+ABONO_FECHA_INCREMENTO				37	string	-	-	
+ABONO_PENDIENTE_MIGRAR				38	string	-	-
+ABONO_MODIFICACION_BANDA			39	string	-	-
+
+
+# Campos para Contratacion de Servicios
+*base 1500
+SPCODE						1	long	-	-
+ACCION						2	string	-	-
+TMCODE						3	long	-	-
+ORIGEN2						4	long	-	-
+IVR_SERVCODE					5	string	-	-
+
+
+*base 1520
+NUMERO_LINEA_ORIGEN				1	string	-	-
+NUMERO_LINEA_DESTINO				2	string	-	-
+MENSAJE1					3	string	-	-
+
+
+*base 1530
+GESTIONA_LINEA					1	string	-	-
+DESCRIPCION2					2	string	-	-
+NOMBRE_CORTO					3	string	-	-
+NUMERO_IMEI					4	string	-	-
+NUMERO_ESN					5	string	-	-
+TECNOLOGIA2					6	string	-	-
+FUENTE						7	string	-	-
+SECUENCIA					8	string	-	-
+ACTIVIDAD_ID 					9 	string	-	-
+ACTIVIDAD_RTA 					10	string	-	-
+ACTIVIDAD_DESC					11	string	-	-
+ACTIV_DATO_ADIC_NOMBRE				12	string	-	-
+ACTIV_DATO_ADIC_VALOR				13	string	-	-
+USUARIO_CRM					14	string	-	-
+IMSI						15	string	-	-
+ICCID						16	string	-	-
+GENERAR_TICKLER					17	string	-	-
+GESTION_ID					18	string	-	-
+ACTIV_DATO_ADIC_TIPO				19	string	-	-
+ACTIV_DATO_ADIC_SUBTIPO				20	string	-	-
+TIPO_PROCESAMIENTO				21	string	-	-
+TIPO_GESTION 					22	long	-	-
+DATOS_LONG_DESCRIPTION				23	string	-	-
+RESULT_CODE    					24  	long	-	- 
+FECHA_CREACION 					25   	string	-	-
+DATOS_ADICIONALES				26	string	-	-
+LIMITE_CREDITO_NUEVO				27	float	-	-
+TOTAL_CONSUMIDO					28	float	-	-
+MONTO_ADICIONAL					29	float	-	-
+
+
+*base 1560
+CHECKSUM_1					1	long	-	-	
+CHECKSUM_2					2	long	-	-
+CHECKSUM_3					3	long	-	-
+CHECKSUM_4					4	long	-	-
+
+
+*base 1570
+PORCENTAJE_EXCEDENTE				1	float	-	-
+RESET_PAGO					2	string	-	-
+FLAG_REHABILITA					3	string	-	-
+FLAG_SUPERA_EXCEDENTE				4	string	-	-
+LIMITE_CREDITO_ANTERIOR				5	float	-	-
+
+#VALIDA SUSPENSION SINIESTRO SIEBEL
+*base 1580
+NIVEL						1	long	-	1:VALIDA LINEA / 0:VALIDA CUENTA
+
+*base 1610
+GENERO            				1   string	-	-         
+FECHA_NACIMIENTO  				2   string	-	-    
+ID_OPCION         				3   long	-	-      
+NOMBRE_LISTA      				4   string	-	-    
+OPCION_CORRECTA   				5   long	-	-     
+ID_PROVINCIA      				6   string	-	-    
+PROVINCIA_DESC    				7   string	-	-    
+ID_LOCALIDAD      				8   string	-	-    
+LOCALIDAD_DESC    				9   string	-	-    
+PISO_USUARIO      				10  string	-	-    
+DEPTO_USUARIO     				11  string	-	-    
+CANTIDAD_LINEAS   				12  long	-	-     
+CRITERIO_SELEC    				13  long	-	-     
+TERMINACION       				14  string	-	-    
+PRICE_GROUP       				15  string	-	-    
+CICLO_FACT        				16  string	-	-    
+CATEG_IMPOSITIVA  				17  string	-	-      
+GRUPO_IMPOSITIVO  				18  string	-	-      
+VENDEDOR          				19  string	-	-      
+CATEG_VENDEDOR    				20  string	-	-      
+PUNTO_RECAU       				21  string	-	-      
+PREFIJO           				22  string	-	-    
+TIPO_DOCUM_STR    				23  string	-	-    
+NUM_CUENTA_STR        				24  string	-	-
+
+# Campos fijos para PFE
+*base 1640
+CFG_VERS					1	string	-	-
+CFG_CLINAME					2	string	-	-
+OPTYPE  					3	string	-	-
+
+# Campos fijos para MVNO
+*base 1650
+PREFIJO_LINEAS_URU      			1	string	-	-
+
+# CAMPOS AGREGADOS BRM
+*base 1660
+TTNAME						1	string	-	Descripcion de la banda horaria
+TIPO_UNIDADES_LIBRES				2	string	-	Tipo de Unidades libres
+FECHA_APLIC_UNIDADES_FROM			3	string	-	Fecha de Unidades desde
+FECHA_APLIC_UNIDADES_TO				4	string	-	Fecha de Unidades hasta
+DESC_PAQUETE					5	string	-	Descripcion del paquete
+BANDA_HORARIA					6	string	-	Banda Horaria
+CANT_UNI_LIBRES_CONSUMIDAS			7	float	-	Cantidad unidades libres consumidas
+CANT_UNI_LIBRES_DISPONIBLES			8	float	-	Cantidad unidades libres disponibles
+NIVEL_INTERACCION_NEGOCIO			9	string	-	Nivel Interaccion negocio
+SISTEMA_FACTURADOR				10	string	-	Sistema Facturador       
+IMPORTE_TASADO                  		11      float   -       Montos consumidos
+LIMITE_CONTRATO                 		12      float   -       Limite maximo de acuerdo al perfil de responsable de pago
+LIMITE_CREDITO_PAGO             		13      float   -       Monto pagos a cuenta realizados por cliente
+IMPORTE_DTO_TASADO              		14      float   -       Monto tasado con descuento excedente
+UMBRAL1                         		15      string  -       Umbral 1
+UMBRAL2                         		16      string  -       Umbral 2
+UMBRAL3                         		17      string  -       Umbral 3
+CANT_UNI_LIBRES_CONSUMIDAS_BANDA                18      string  -       Cantidad de unidades consumidas por banda
+CANT_UNI_LIBRES_DISPONIBLES_BANDA               19      string  -       Cantidad de unidades libres por banda
+
+
+# Variables para Consumo de Packs
+*base 1700
+SERVICIO_TIPO			1	string	-	Tipo de servicio para el canal (SMS, MMS, INTERNET, etc).
+SERVICIO_ESTADO			2	string	-	Estado del tipo de servicio para el canal.
+SERVICIO_MEDIDA			3	string	-	Medida del tipo de servicio (UNIDAD / TIEMPO).
+PACK_SERVICIO_TIPO      	4	string	-	Tipo de servicio del Pack (SMS, MMS, INTERNET, etc).
+PACK_SERVICIO_ESTADO		5	string	-	Estado del tipo de servicio del Pack para la lìnea.
+FLAG_DESCUENTO_BENEF		6	string	- 	Flag que indica si el Pack se descuenta o no del beneficio.
+FECHA_CORTE			7  	string  -       Fecha de Corte de facturacion
+FECHA_VTO_FACT			8	string	-	Fecha de Vencimiento de factura de pack adquirido
+FLAG_CTROL_SERV			9	string	-	Flag que indica si la línea posee pack de llamada en consulta
+PRECIO_OFERTA_PROD              10      float   -       Precio de Oferta de Producto
+CODIGO_INTERFAZ                 11      string  -       Canal de autogestion por donde se activo el pack
+USUARIO_PACK                    12      string  -       Usuario que activo el pack
+ESTADO_ITEM                     13      string  -       Solicitado / Activo / Desactivo / Cancelado
+FASE                            14      long    -       Fase
+
+#Variables para Encriptacion de TC
+*base 1800
+SIGA_NUM_TARJETA		1	string	-	Numero de TC
+SIGA_NUM_TARJETA_ENC		2	string	-	Numero de TC encriptado
+
+#Variables Portabilidad Numerica
+*base 1900
+NUM_SOLICITUD_PORT		1	string	-	Numero Solicitud Portacion
+TIPO_PROCESO_PORT		2	string	-	Tipo Proceso Portacion
+FECHA_VENTANA_PORT		3	string	-	Fecha Ventana Portacion
+ESTADO_PROCESO_PORT		4	string	-	Estado Proceso Portacion
+SUB_ESTADO_PROCESO_PORT		5	string	-	Sub Estado Proceso Portacion
+FECHA_ESTADO_PROCESO_PORT	6	string	-	Fecha Estado Proceso Portacion
+COD_CAUSA_RECHAZO_PORT		7	string	-	Codigo Causa Rechazo Portacion
+INDICE_MOTIVO			8	string	-	Cantidad de motivos rechazo
+AUDIO				9	string	-	Archivo de audio
+MOTIVO_PORT			10	string	-	Motivo de rechazo
+
+#Variables Portabilidad Numerica
+*base 1930
+MIN_ROLLOVER			1	string	-	Minutos de RollOver
+APLICA_ROLLOVER			2	string	-	Aplica RollOver
+
+#Variables E-Commerce
+*base 1940
+ID_VTEX				1	string	-	Id de VTEX
+MEDIO_PAGO			2	string	-	Medio de Pago
+TITULAR				3	string	-	Nombre del Titular TC
+CUOTAS				4	string	-	Numero de cuotas
+CANAL				5	string	-	Canal
+PRODUCTO			6	string	-	Producto
+NUM_COMERCIO		7	string	-	Nro Comercio
+ID_FINANCIACION		8	string	-	Financiacion
+TELEFONO			9	string	-	Telefono coordinar entrega
+TELEFONO_ALT		10	string	-	Telefono coordinar entrega
+ENTRE_CALLE1		11	string	-	Calle lateral de entrega
+ENTRE_CALLE2		12	string	-	Calle lateral de entrega
+HORA_DESDE			13	string	-	inicia disponibilidad mañana
+HORA_HASTA			14	string	-	finaliza disponibilidad mañana
+HORA_DESDE_ALT		15	string	-	inicia disponibilidad tarde
+HORA_HASTA_ALT		16	string	-	finaliza disponibilidad tarde
+OBSERVACIONES		17	string	-	Datos adicionales
+DATOS_AUTORIZADOS	18	string	-	Datos de Personas autorizadas a recibir pedido
+INTERES_CALCULADO	19	string	-	interes sin impuestos
+CARGO_ENVIO			20	string	-	Cargo de Envio
+TIPO_PRECIO			21	string	-	Tipo de Precio
+TIPO_OPERACION		22	string	-	Tipo Operacion
+PROMOCION			23	string	-	Codigo de promocion
+TIPO_ENVIO			24	string	-	Tipo de Delivery
+VERSION_PROMOCION	25	string	-	Id Version Promocion
+FECHA_OPERA_ECOMM	26	string	-	Fecha de confirmacion
+CUPON				27	string	-	Cupon
+ID_PAGO				28	string	-	Id de Pago
+NMU					29	string	-	Id Terminal Tel.
+TRANSACTION_ID		30	string	-	Id para hacer POST del pago
+ESTADO_ORDEN		31      string  -       Estado Orden
+ID_ORDEN			32      string  -       Id Orden
+COD_BANCO			33	string	-	codigo del banco
+REGLA				34	string 	-	Regla Ecommerce
+RESULTADO_PAGO		35	string	-	Resultado Pago Decidir
+ENTIDAD_TC			36	string	-	Entidad de la TC
+DESC_PRODCUTO		37	string	-	Descripcion del producto
+UPSELLING_FLAG		38	string	-	Flag para saber si la venta es con Upselling
+TIPO_CUPON			39	string	-	Tipo cupon de pago
+CONNECTOR_TID		40	string	-	Transaction ID del connector de pago
+TOKEN				41	string	-	Token
+REFUND_VALUE		42	string	-	Importe a devolver
+CONNECTOR			43	string	-	Connector de pago
+
+URL					45	string	-	Url
+GESTION_ESTADO		46	string	-	Gestion Estado
+GESTION_SUBESTADO	47	string	-	Gestion SubEstado
+GESTION_CONTINUAR	48	string	-	Gestion Continuar
+DELIMITADOR			49	string	-	Usado en el paramgestor para separar palabras
+
+PAGO_OK_SIEBEL			53	string	-	Pago OK Siebel
+PAGO_ERROR_SIEBEL		54	string	-	Pago ERROR Siebel
+
+COMMENT				57	string	-	Descripcion Actualizacion Siebel
+COURIER_ID			58	string	-	Courier Id Retiro Sucursal
+RESULTADO_VTEX		59	string	-	Campo tabla Resultado
+
+
+
+#Variables LTE-4G
+*base 2000
+ESTADO_LTE		1	long	-	Estado del IMEI en la tabla
+REG_EN_PROCESO	2	long	-	Registro en Proceso
+REG_OK			3	long	-	Registro OK
+REG_ERROR		4	long	-	Registro ERR
+REG_PENDIENTE	5	long	-	Registro Pendiente
+REG_NS_FML_FIELDS	6	long - Buffer Max Field
+REG_MXSTR_FML_FLD	7	long	-	Buffer Max Strings
+CHECK_HITS			8	long	-	Check Hits
+LTE_STATUS			9	long	-	Variable de Status LTE
+MIN_SLEEP_TIME		10	long	-	Min Sleep Time
+MAX_SLEEP_TIME		11	long	-	Max	Sleep Time
+NOMINATIVIDAD_STATUS 12	long	-	Estado de la Linea en la tabla
+KEY					 13 string	-	Key del WS
+APLICA_NOMINACION	 14 long 	-	Aplica Nominatividad
+ESTADO_NOMINATIVIDAD 15	long	-	Estado de la Linea en la tabla
+
+
+#Variables WS
+*base 2100
+XMLPARAM	1	string	-	Parametros para XML de WS/API
+WSNAME		2	string	-	Nombre del servicio a invocar(.ini)
+URLPARAM	3	string	-	Parametro para URL de WS/API
+RETPARAM	4	string	-	Retorno de parametros especificos del WS/API
+RETERROR	5	string	-	Retorno de parametros especificos del WS/API Error
+
+#Variables JASPER
+*base 2120
+ESTADO_JASPER	1	string	-	Estado Jasper
+
+*base 2200
+#Informacion para RTPL
+PIN_RCTPL			1	string	-	Codigo Secreto (PIN) de la TPL.
+CODIGO_RECARGA			2	string	-	Codigo del tipo de recarga.
+NUMERO_SERIE			3	string	-	Numero de Serie que identifica a la TPL.
+RESULTADO_BTPL			4	string	-	Codigo del resultado de la recarga de TPL.
+RESULTADO_RTPL			5	string	-	Codigo del resultado del rollback de la recarga de TPL.
+BASKET_TYPE					6	string	- tipo de saldo ( 0 saldo en $ - 4 saldo en cantidad de SMSs)
+BASKET_VALUE					7	string	- Saldo en $ si BASKET_TYPE = 0 - Cantidad de SMS si BASKET_TYPE = 4 
+EXPIRY_BONUS_TIME			8		string	Fecha de expiracion del saldo, solo para BASKET_TYPE = 0 (SMS)
+
+*base 2300
+#FAN
+ID_RESERVA			1	string	-	Id de la reserva.
+DEALER			2	string	-	Dealer.
+OFICINA			3	string	-	Oficina.
+TRANS_ID			4	string	-	Transactional Id.
+#VMIGetAvaibility
+COD_PUNTO_VENTA	5	long	-	Punto de venta
+COD_FAMILIA_PRODUCTO	6	string	-	Familia Producto
+STOCK_PRODUCTO	7	string	- Stock
+COD_DEPOSITO	8	string	-	Codigo de deposito
+DESC_DEPOSITO	9	string	-	Descripcion de deposito
+CANTIDAD_EXISTENTE	10	long	-	Canitdad que existe
+MARCA_PRODUCTO	11	string	-	marca del producto
+CANTIDAD_DISPONIBLE	12	long	-	cantidad Disponible
+CANTIDAD	13	long	-	Cantidad
+REALIZADO	14	string	-	Estado de la accion
+ID_OPERACION	15	long	-	Id de la opreacion de compras
+COD_APLICACION	16	string	-	Codigo de la aplicacion utilizada
+#VMIgetSerializedProductDataVMI
+NUMERO_DESPACHO	17	string	-	Numero de despacho
+ANIO_IMPORTACION	18	long	-	año de importacion
+PAIS_ORIGEN	19	string	-	Pais de origen
+PAIS_PROCEDENCIA	20	string	-	Pais de procedencia
+ADUANA_INGRESO	21	string	-	ingreso de aduana
+FECHA_ALTA	22	string	-	Fecha de alta
+ESTADO	23	string	-	Estado operacion
+CODIGO_RESULTADO	24	string	-	Codigo 
+MENSAJE_RESULTADO	25	string	-	Mensaje
+COD_ORDEN	26	string	-	Numero Caso
+COD_CAUSA	27	string	-	Codigo de Causa
+NUMERO_SERIE_ORIG	28	string	-	Numero de serie Original
+MARCA_SP	29	string	-	Marca sp
+KI	30	string	-	Clave de autenticación de SIM
+FECHA_INGRESO	31	string	-	Fecha en que ingresa al punto de venta
+UBICACION	32	string	-	Ubicación en la plantilla digital del punto de venta
+COD_VENTA_LINEA	33	long	-	Codigo de categoría venta linea
+LOG_MSG	34	string	-	Mensaje de log por graylog
+FECHA	35	string	-	Fecha
+MERCADO	36	string	-	Mercado de una linea
+SUS_SINIES	37	string	-	Suspension por siniestro
+EST_COD_ACT	38	string	-	Estado del contrato activo
+FECHA_SUSP	39 string	- Fecha de suspension
+FACTURA	40 string	- Numero de factura
+FECHA_FACT	41	string	- Fecha de factura
+FECHA_MOD_CONT 42	string	-	Fecha modificacion contrato
+
+
+*base 2400
+#getPlanesCanalDigital-VENTAS
+COD_MERCADO_ORIGEN	1	string	-	Codigo del mercado POS PRE MIX
+COD_MERCADO_DESTINO	2	string	-	Codigo del mercado POS PRE MIX
+COD_PLAN_ORIGEN		3	long	-	Codigo del plan
+CONCEPTO_UPGRADE	4	string	-
+COD_VENDEDOR		5	long	-	Codigo del mercado POS PRE MIX
+ORDEN				6	long	-	Orden de visualización de los planes
+COD_REGLA			7	string	-	Codigo de la regla de negocio
+TIPO_REGLA			8	string	-	Tipo de regla UPGRADE o FIDELIZACION
+COD_PLAN_DESTINO	9	long	-	TMCODE de plan destino
+VERSION_PLAN_DESTINO	10	long	-	Version plan destino configurado en la regla
+DESC_CORTA_PLAN		11	string	-	Descripcion corta del plan destino
+DESC_PLAN			12	string	-	Descripcion del plan destino
+MONTO_BASE			13	float	-	Calculo de servicio de Telefonía de aire mas servicio de datos               (CA getPlanesCanalDigital: pasa de long a float) 
+MONTO_DESC_SN		14	float	-	Suma de todos los servicios negativos asociados al plan destino              (CA getPlanesCanalDigital: pasa de long a float)
+MONTO_PLAN_SN		15	float	-	Calculo servicio de Tel aire mas serv de datos menos total de serv negativos (CA getPlanesCanalDigital: pasa de long a float)
+MONTO_DESC_CF_TAIRE	16	float	-	Monto final del serv Tel Aire aplicando la bonificación por Change Fee       (CA getPlanesCanalDigital: pasa de long a float)
+PORC_DTO_CF_TAIRE	17	float	-	Valor relativo en caso de configurarse                                       (CA getPlanesCanalDigital: pasa de long a float)
+PERIODO_CF_TAIRE	18	long	-	Meses bonificados para el servicio de tel aire 
+MONTO_DESC_CF_DATOS	19	float	-	Monto final del servicio de Datos aplicando la bonificación por Change Fee   (CA getPlanesCanalDigital: pasa de long a float)
+PORC_DTO_CF_DATOS	20	float	-	Valor relativo en caso de configurarse                                       (CA getPlanesCanalDigital: pasa de long a float)
+PERIODO_CF_DATOS	21	long	-	Meses bonificados para el servicio de datos
+MONTO_PLAN			22	float	-	Calculo de serv de Tel aire mas serv de datos menos total de serv negativos  (CA getPlanesCanalDigital: pasa de long a float)
+PROMO_ID			23	long	-	Id de promocion
+PROMO_VERSION		24	long	-	Version de la promocion
+VOLUMEN_DATOS		25	string	-	Volumen de datos obtenido de la tabla PAIS.BS_FAC_CNC_CONFIG_FAC
+MERCADO_PLAN		26	string	-	Mercado del plan destino
+#changePlanesCanalDigital
+CLIENTE				30	long	-	Numero de cliente
+TIPO_CAMBIO			31	string	-	tipo de cambio
+USUARIO				32	string	-	Usuario
+COD_PLAN_DEST		33	long	-	Cogigo plan destino
+CANAL_VENTA			34	string	-	Canal de venta
+DESC_PLAN_ORIGEN	35	string	-	Descripcion plan origen
+DESC_PLAN_DESTINO	36	string	-	Descripcion plan destino
+#getEstadoLinea
+MOTIVO_ESTADO       37  string  -   Motivo del Estado
+MARCA_ACTIVACION    38  string  -   Marca que indica si aun la linea está pendiente de Activación ('X')
+DESC_MOTIVO_ESTADO  39  string  -   Campo armado por el SP para indicar el motivo del Estado
+#getLineaRepro
+RESPUESTA           40  string  -   0: Línea apta para nominar. 1: Línea no apta para nominar
+#getDatosPlan
+PRECIO_PROD         41  float   -   Precio
+#getDatosResponsableDePago
+FAX                 42  string  -   Fax
+#getDatosMovilDocLinea
+DES_PLAN            47  string  -   Descripcion del plan. Por ejemplo: Conexión  Control
+#updateDatosNominacion
+MARCA_EXISTE_PADRON 48  long    -   indica si el documento se encuentra en el Padron  
+TIPO_DIRECCION      49  string  -   Solo puede ser L F o A (tipo de domic. Legal Fiscal o Alternativo)
+MARCA_DIR_VERIFICADA    50  long    -   Indica si la dirección está normalizada.
+COD_ACCION_NEG      51  string  -   Codigo de accion de negocio
+#notificarPagoAnulacionTux
+NRO_FICHA           52  long    -   Numero de la ficha de ingreso en Negocio.
+NRO_CUPON           53  string  -   Nro de cupon de la tarjeta
+FECHA_PAGO          54  string  -   Fecha del pago
+COD_MEDIO_PAGO      55  string  -   Medio de pago
+IMPORTE_PAGADO      56  float   -   Monto pagado
+COD_TARJETA         57  string  -   Codigo de la tarjeta
+CANTIDAD_CUOTAS     58  long    -   Cantidad de cuotas en la tarjeta 
+NRO_TARJETA         59  string  -   Numero de la tarjeta
+#obtenerDatosVentaTux
+IMPORTE_COMPROBANTE 60  float    -   Monto total del comprobante
+CANTIDAD_ITEMS      61  long    -   Cantidad de ítems o registros que devuelve la consulta
+TIPO_DOCUMENTO      62  string  -   Tipo de documento valido
+NUMERO_DOCUMENTO    63  string  -   Numero de documento (actualmente valida solo DNI, CUIT, CI, PASAPORTE, LC, LI, CUIL)
+ID_CLIENTE          64  string  -   Identificador de transacción. Datos del Cliente para control de fraude en Wondersoft.
+LINEA_PRODUCTO      65  string  -   Línea de producto del operador	
+#notificarPagoAnulacionTux
+EQUIPO              66  string  -   Equipo desde donde se realiza la transaccion
+COD_RESPUESTA_W     67  long    -   Es el codigo asociado a una respuesta - Definidos por Wondersoft	
+DESC_RESPUESTA_W    68  string  -   Es el valor de la respuesta - Definidos por Wondersoft	
+#getDatosDomicilios
+RAZON_SOCIAL        69  string  -   Razon social del cliente
+TIPO_DOMICILIO      70  string  -   Tipo de domicilio (Ambos, Facturacion, Legal)
+NOMBRE_CALLE        71  string  -   Nombre de calles
+NRO_PISO            72  string  -   Numero de Piso
+NOMBRE_CIUDAD       73  string  -   Nombre de Nombre de Ciudad 
+COD_AREA_GEO        74  string  -   Codigo de Area Geografica de la linea del cliente
+NOMBRE_PROVINCIA    75  string  -   Nombre de Provincia 
+#getDeudaImputacionDetalleTux
+TIPO_COMPROBANTE    76  string  -   valores posibles de entrada: FAC, DEB, FC o TODOS
+CLASE_COMPROBANTE   77  string  -   Letra que identifica al comprobante, valores de entrada: A, B
+SUCURSAL_COMPROBANTE    78  string  -   sucursal a la que pertenece el comprobante
+NUMERO_COMPROBANTE_STR  79  string  -   Número del comprobante Ejemplo: 500
+TIPO_DOCUMENTO_ULTIMO   80  string  -   Último tipo de documento. Para la paginación.
+CUSTOMER_ID_CLIENTE 81  long    -   Para efectos del páginado. Último id Cliente
+ULTIMO_NRO_COMPROBANTE  82  string    -   Para efectos del páginado. Último número del comprobante / fml v17
+CANTIDAD_TOTAL      83  long    -   Cantidad de registros totales CC
+CANTIDAD_PAGINA     84  long    -   Cantidad de registros retornados CC
+SUBTIPO_DOCUMENTO   85  string  -   Vendrá siempre vacío porque no existe en BSCS
+IMPORTE_MONEDA_ORIGEN   86  float   -   Vendrá siempre vacío porque no existe en BSCS.
+IMPORTE_PES         86  float   -   Vendrá siempre vacío porque no existe en BSCS.
+IMPORTE_FECHA_COT   87  float   -   Vendrá siempre vacío porque no existe en BSCS.
+SALDO_FECHA_EMISION 88  float   -   Vendrá siempre vacío porque no existe en BSCS.
+SALDO_FECHA_COTIZACION  89  float   -   Vendrá siempre vacío porque no existe en BSCS.
+MARCA_MIGRADO_DEIMOS    90  string  -   Indica si se migró a Deimos
+TASA_CERO           91  string  -   se marcará con ?X? si contiene un 0, sino nulo
+DIAS_GRACIA         92  long    -   Cantidad de días en los cuales no se considera moroso a un cliente a partir del momento de que tiene un comprobante con deuda
+FECHA_CALCULADA     93  string  -   Indica la nueva fecha en la que vence el comprobante al haberle sumado los días de gracia a la fecha de vencimiento FML v17
+TIPO_MARCA_ADHESION 94  long    -   Valores posibles: 1, 2, 3 o 4.	
+MARCA_ADHESION      95  string  -   Valores posibles: Debito Directo (Banco), Débito Automático (TC), Efectivo o STDBT	
+MARCA_RECLAMO       96  string  -   Se retornara un SI en el caso que algún el Responsable de Pago tenga al menos una de las siguientes gestiones de reclamo
+TIPO_CAMBIO_FECHA_EMI   97  float   -   Vendrá siempre vacío porque no existe en BSCS.	
+TIPO_CAMBIO_FECHA_COT   98  float   -   Vendrá siempre vacío porque no existe en BSCS.	
+#getDeudaImputacionAgrupada (usa tb campos de getDeudaImputacionDetalleTux)
+TIPO_SALDO          99  string  -
+FECHA_VTO_DESDE     100 string  -
+FECHA_VTO_HASTA     101 string  -
+FECHA_COTIZACION    102 string  -
+DIGITO_VERIFICADOR_RP   103 long    -
+FECHA_SALDO_FAVOR       104 string  -
+TASA_CERO_RP            105 string  -
+#getDeudaImputacionDetalleTux
+NRO_INTERNO_FACTURA     106 long    -   numero interno de factura
+COD_MONEDA          107 string  -   Siempre vendra peso por no haber otra moneda en BSCS
+NUMERO_DOCUMENTO_ULTIMO 108 string  -   Último número de documento. Para la paginación.
+RESULTADO_OPERACION     109 string  -   Resultado de la operación (OK, NOK, ERR)
+#CA1 en getAvailabilityVMI
+COD_GAMA                110 string - Codigo de la gama del producto
+MARCA_CORE              111 string - Indicación de servicio obligatorio del plan X es obligatorio  
+FECHA_SERVICIO          112 string - Fecha del servicio
+ESTADO_PENDIENTE        113 string - Estado pendiente del servicio
+TIPO_MOD                114 string - Tipo de descuento A absoluto, R relativo
+PERIODO                 115 long - Periodos a aplicar
+IMPORTE_MOD             116 float - Valor de descuento
+FECHA_DESDE             117 string - Fecha Inicio control activación
+FECHA_HASTA             118 string - Fecha Fin control activación
+TIEMPO_VIGENCIA         119 long - Tiempo de vigencia en días
+#getPlanesConDescuentosNegocio
+PERIODO_STR             120 string - Periodo de descuento
+MONTO_ABSOLUTO_STR      121 string - Valor del servicio con el descuento
+MONTO_RELATIVO_STR      122 string - Valor del servicio con el descuento
+DESC_SERVICIO           123 string - Descripcion del servicio
+MONTO                   124 float - Valor del servicio sin descuentos
+TMCODEP                 125 long - Codigo que relaciona Plan con Servicios en cursor Plan
+TMCODES                 126 long - Codigo que relaciona Plan con Servicios en cursor Servicios

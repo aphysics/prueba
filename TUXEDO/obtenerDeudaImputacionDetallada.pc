@@ -1,0 +1,779 @@
+/*------------------------------------------------------------------*/
+/* Servicio: getDeudaImputacionDetalleTux V64                       */
+/* Autor(es): Guillermo Molteni <- Modificado por Alex Padilla                       */
+/* Doc: https://docuit.personal.corp/display/DMB/getDeudaImputacionDetalleTux */
+/* se elimino mock porque ahora tenemos SP funcionando              */
+/*------------------------------------------------------------------*/
+#if defined(__STDC__)||defined(__cplusplus)
+void getDeudaImputacionDetalleTux(TPSVCINFO *msg)
+#else
+void getDeudaImputacionDetalleTux(msg)
+TPSVCINFO *msg;
+#endif
+{
+
+        /*--- Local Oracle Variables Definition ---*/
+
+		char serviceName[]="getDeudaImputacionDetalleTux";
+		
+        EXEC SQL BEGIN DECLARE SECTION;
+        char tid[100+1] = "";
+
+        char cMiListaTipo[2000 + 1] = "";
+        char cMiListaNumero[2000 + 1] = "";
+
+		//IN
+        char ctipoDocumento[20+1] = "";		  //	TIPO_DOCUMENTO		                str
+        char cnumeroDocumento[30+1] = "";	  //	NUMERO_DOCUMENTO		            str
+        char ctipoComprobante[5+1] = "";	  //	TIPO_COMPROBANTE		            str
+        char ctipoCambio[5+1] = "";	          //	TIPO_SALDO        		            str
+        long lcantidadItems=0L;	         	  //    CANTIDAD_ITEMS		                long
+        char cclaseComprobante[1+1] = "";	  //	CLASE_COMPROBANTE	    opcional	str
+        char csucursalComprobante[4+1] = "";  //	SUCURSAL_COMPROBANTE	opcional	str
+        char cnumeroComprobante[8+1] = "";	  //	NUMERO_COMPROBANTE_STR	opcional	str
+        char cfechaVigencia[8+1] = "";		  //	FECHA_VTO_DESDE	        opcional	str      25
+        char cfechaVto[8+1] = "";		      //	FECHA_VTO_HASTA         opcional	str      25
+        char cfechaCorte[8+1] = "";	          //	FECHA_COTIZACION        opcional	str      25
+        long lcustomerId=0L;           		  //	CUSTOMER_ID	            opcional	long
+        char ccodigoMoneda[5+1] = "";         //    COD_MONEDA          	opcional	str	         20
+        char ctipoDocumentoUltimo[20+1] = ""; //    TIPO_DOCUMENTO_ULTIMO	opcional	str
+        char cnumDocum[30+1] = "";			  //	NUMERO_DOCUMENTO_ULTIMO opcional	str
+        long lcustomerIdCliente=0L;           //    CUSTOMER_ID_CLIENTE     opcional    long
+        char cultimoNroComprobante[20+1] = "";//    ULTIMO_NRO_COMPROBANTE  opcional    str
+        char cfechaVtoFact[25+1] = "";		  //	FECHA_VTO_FACT	        opcional	str
+        
+        char cfactura[25]="";                     //    FACTURA                 opcional	long 
+        long lfactura=0L;                     //    campo para el SP.
+        
+        //OUT
+        // cursorParam   (ya esta definido)
+        long  lcantidadTotal=0L;			      //	CANTIDAD_TOTAL	        0:1	Long
+        short indlcantidadTotal;
+        long  lcantidadPagina=0L;			      //	CANTIDAD_PAGINA	        0:1	Long
+        short indlcantidadPagina;
+        long lcustomerIdResp=0L;			      //	CUSTOMER_ID_RESP	    1:N	Long
+        long ldigitoVerificadorRp=0L;			  //	DIGITO_VERIFICADOR_RP	1:N	Long       
+        char cnumeroComprobanteStr[8+1]="";       //    NUMERO_COMPROBANTE_STR  1:N String
+        char csubtipoDocumento[9+1]="";           //    SUBTIPO_DOCUMENTO       1:N String
+        float fimporte = 0.0;                     //    IMPORTE                 1:N float
+
+        float fimporteMonedaOrigen=0.0;           //    IMPORTE_MONEDA_ORIGEN   1:N float
+        short op_importeMonedaOrigen;
+        float fimportePes=0.0;                    //    IMPORTE_PES             1:N float
+        short op_importePes;
+        float fimporteFechaCot=0.0;               //    IMPORTE_FECHA_COT       1:N float
+        short op_importeFechaCot;
+        float fsaldoActual=0.0;                   //    SALDO_ACTUAL            1:N float
+        short op_saldoActual;
+        float fsaldoFechaEmision=0.0;             //    SALDO_FECHA_EMISION     1:N float
+        short op_saldoFechaEmision;
+        float fsaldoFechaCotizacion=0.0;          //    SALDO_FECHA_COTIZACION  1:N float
+        short op_saldoFechaCotizacion;
+        char cestCodEst[20+1] = "";			      //	EST_COD_ACT	            1:N	String
+        short op_estCodEst;
+
+
+        char cmarcaMigradoDeimos[1+1] = "";       //	MARCA_MIGRADO_DEIMOS	1:N	String
+        char ctasaCero[1+1] = "";			      //	TASA_CERO  	            1:N	String     
+        long lDiasGracia=0L;			          //	DIAS_GRACIA	            1:N	Long      
+        char cfechaCalculada[25+1]="";            //    FECHA_CALCULADA         1:N String
+        long ltipoMarcaAdhesion=0L;			      //	TIPO_MARCA_ADHESION	    1:N	Long
+        char cmarcaAdhesion[30+1] = "";			  //	MARCA_ADHESION	        1:N	String
+        char cmarcaReclamo[30+1]="";              //    MARCA_RECLAMO           1:N String
+        float ftipoCambioFechaEmi=0.0;            //    TIPO_CAMBIO_FECHA_EMI   1:N String
+        float ftipoCambioFechaCot=0.0;            //    TIPO_CAMBIO_FECHA_COT	1:N String
+        char cfechaCreacion[25+1]="";             //    FECHA_CREACION          1:N String
+        long lnroInternoFactura=0L;               //    NRO_INTERNO_FACTURA     1:N long
+        char cresultadoOperacion[3+1]="";         //    RESULTADO_OPERACION     0:1 String
+        short indresultadoOperacion;
+        
+        long nCodeError=0;                        //    CODE_ERROR              0:1 long
+        char cDescError[20000 + 1]= "";           //    DESC_ERROR              0:1 String    500
+        short indCodError;
+        short indDescError;
+        EXEC SQL END DECLARE SECTION;
+
+        /*--- Socket Variables Definition ---*/ 
+        errorType error;
+
+        /*--- Local Tuxedo FML Variables Definition ---*/
+        FBFR32   *fdata;
+        FLDLEN32 len;        
+        FBFR32 *fdataOut;
+
+        /*--- Init Service with no errors ---*/
+        error.exist = FALSE;
+
+        /*--- Local Tuxedo FML Variables Definition and init TRANS_ID ---*/
+
+        fdata=(FBFR32 *)msg->data;
+
+        strcpy(tid, getTID(fdata));
+
+        if ( !error.exist && ((fdataOut=(FBFR32 *)tpalloc("FML32", NULL, 1024*1000)) == NULL) ) {
+            loadError("Falla de tpalloc", ERR_TECNICO, (char *)fdata);
+            writeLog_STR(ERRORMSG,serviceName, Fstrerror32(Ferror32), Ferror32, tid);
+            tpreturn(TPFAIL, 0, (char *)fdata, 0L, 0);
+        }
+
+        Finit32(fdataOut, Fsizeof32(fdataOut));
+
+        if (!error.exist && Fchg32((FBFR32 *)fdataOut, TRANS_ID , 0, (char *)&tid, 0L) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fchg-TRANS_ID");
+        }
+
+        /*--- Read data from buffer ---*/
+        if ( !error.exist && validateFMLRequest(fdata, 5, TIPO_DOCUMENTO, NUMERO_DOCUMENTO, TIPO_COMPROBANTE, TIPO_SALDO, CANTIDAD_ITEMS ) )
+        {
+            setErrMsg(&error, ERR_VAL_PARAMS, "srvBSCS(getDeudaImputacionDetalleTux): Faltan parametros");
+        }   
+
+        // cargar todos los parametros 
+        
+        len=sizeof(ctipoCambio);
+        if (!error.exist && Fget32(fdata, TIPO_SALDO, 0, (char *)&ctipoCambio, &len) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-TIPO_SALDO");
+        }
+
+        len=sizeof(ctipoComprobante);
+        if (!error.exist && Fget32(fdata, TIPO_COMPROBANTE, 0, (char *)&ctipoComprobante, &len) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-TIPO_COMPROBANTE");
+        }
+
+        len=sizeof(lcantidadItems);
+        if (!error.exist && Fget32(fdata, CANTIDAD_ITEMS, 0, (char *)&lcantidadItems, &len) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-CANTIDAD_ITEMS");
+        }
+
+        if(Foccur32(fdata,CLASE_COMPROBANTE))
+		{
+            len=sizeof(cclaseComprobante);
+            if (!error.exist && Fget32(fdata, CLASE_COMPROBANTE, 0, (char *)&cclaseComprobante, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-CLASE_COMPROBANTE");
+            }
+        }
+        
+        if(Foccur32(fdata,SUCURSAL_COMPROBANTE))
+		{
+            len=sizeof(csucursalComprobante);
+            if (!error.exist && Fget32(fdata, SUCURSAL_COMPROBANTE, 0, (char *)&csucursalComprobante, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-SUCURSAL_COMPROBANTE");
+            }
+        }
+
+        if(Foccur32(fdata,NUMERO_COMPROBANTE_STR))
+		{
+            len=sizeof(cnumeroComprobante);
+            if (!error.exist && Fget32(fdata, NUMERO_COMPROBANTE_STR, 0, (char *)&cnumeroComprobante, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-NUMERO_COMPROBANTE_STR");
+            }
+        }
+
+        if(Foccur32(fdata,FECHA_VTO_DESDE))
+		{
+            len=sizeof(cfechaVigencia);
+            if (!error.exist && Fget32(fdata, FECHA_VTO_DESDE, 0, (char *)&cfechaVigencia, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-FECHA_VTO_DESDE");
+            }
+        }
+
+        if(Foccur32(fdata,FECHA_VTO_HASTA))
+		{
+            len=sizeof(cfechaVto);
+            if (!error.exist && Fget32(fdata, FECHA_VTO_HASTA, 0, (char *)&cfechaVto, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-FECHA_VTO_HASTA");
+            }
+        }
+        
+        if(Foccur32(fdata,FECHA_COTIZACION))
+		{
+            len=sizeof(cfechaCorte);
+            if (!error.exist && Fget32(fdata, FECHA_COTIZACION, 0, (char *)&cfechaCorte, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-FECHA_COTIZACION");
+            }
+        }
+
+        if(Foccur32(fdata,CUSTOMER_ID))
+		{
+            len=sizeof(lcustomerId);
+            if (!error.exist && Fget32(fdata, CUSTOMER_ID, 0, (char *)&lcustomerId, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-CUSTOMER_ID");
+            }
+        }
+        
+        if(Foccur32(fdata,COD_MONEDA))
+		{
+            len=sizeof(ccodigoMoneda);
+            if (!error.exist && Fget32(fdata, COD_MONEDA, 0, (char *)&ccodigoMoneda, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-COD_MONEDA");
+            }
+        }
+        
+        if(Foccur32(fdata,TIPO_DOCUMENTO_ULTIMO))
+		{
+            len=sizeof(ctipoDocumentoUltimo);
+            if (!error.exist && Fget32(fdata, TIPO_DOCUMENTO_ULTIMO, 0, (char *)&ctipoDocumentoUltimo, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-TIPO_DOCUMENTO_ULTIMO");
+            }
+        }
+        
+        if(Foccur32(fdata,NUMERO_DOCUMENTO_ULTIMO))
+		{
+            len=sizeof(cnumDocum);
+            if (!error.exist && Fget32(fdata, NUMERO_DOCUMENTO_ULTIMO, 0, (char *)&cnumDocum, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-NUMERO_DOCUMENTO_ULTIMO");
+            }
+        }
+        
+        if(Foccur32(fdata,CUSTOMER_ID_CLIENTE))
+		{
+            len=sizeof(lcustomerIdCliente);
+            if (!error.exist && Fget32(fdata, CUSTOMER_ID_CLIENTE, 0, (char *)&lcustomerIdCliente, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-CUSTOMER_ID_CLIENTE");
+            }
+        }
+
+        if(Foccur32(fdata,ULTIMO_NRO_COMPROBANTE))
+		{
+            len=sizeof(cultimoNroComprobante);
+            if (!error.exist && Fget32(fdata, ULTIMO_NRO_COMPROBANTE, 0, (char *)&cultimoNroComprobante, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-ULTIMO_NRO_COMPROBANTE");
+            }
+        }
+        
+        if(Foccur32(fdata,FECHA_VTO_FACT))
+		{
+            len=sizeof(cfechaVtoFact);
+            if (!error.exist && Fget32(fdata, FECHA_VTO_FACT, 0, (char *)&cfechaVtoFact, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-FECHA_VTO_FACT");
+            }
+        }
+        
+        if(Foccur32(fdata,FACTURA))
+		{
+            len=sizeof(cfactura);
+            if (!error.exist && Fget32(fdata, FACTURA, 0, (char *)&cfactura, &len) == -1) {
+                setErrMsg(&error, ERR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-FACTURA");
+            }
+            lfactura = atol (cfactura);
+        }
+        
+        // preparar lista de tipo numero documento
+
+    	int nLongArrayTipoDocum = Foccur32(fdata, TIPO_DOCUMENTO);
+    	if ( !error.exist && nLongArrayTipoDocum < 0) {
+    		setErrMsg(&error, NRO_ERROR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Foccur32-TIPO_DOCUMENTO");
+        }
+        
+        int nLongArrayNumDocum = Foccur32(fdata, NUMERO_DOCUMENTO);
+    	if ( !error.exist && nLongArrayNumDocum < 0) {
+        	setErrMsg(&error, NRO_ERROR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Foccur32-NUMERO_DOCUMENTO");
+        }
+
+        
+    	if ( !error.exist && (nLongArrayNumDocum != nLongArrayTipoDocum) ) {
+        	setErrMsg(&error, NRO_ERROR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Foccur32-NUMERO_DOCUMENTO-TIPO_DOCUMENTO long distintas");
+        }
+                
+	    int i;
+	    for ( i = 0; ((i < nLongArrayNumDocum) && !error.exist); i++){
+	    
+            if (!error.exist) {
+                len=sizeof(ctipoDocumento);
+                if (Fget32(fdata, TIPO_DOCUMENTO, i, (char *)&ctipoDocumento, &len) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-TIPO_DOCUMENTO");
+                }
+            }	        
+
+            if (!error.exist) {
+                len=sizeof(cnumeroDocumento);
+                if (Fget32(fdata, NUMERO_DOCUMENTO, i, (char *)&cnumeroDocumento, &len) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "srvBSCS(getDeudaImputacionDetalleTux): Falla de Fget-NUMERO_DOCUMENTO");
+                }
+            }	        
+            
+            // armo el array del query, termina con pipe
+	        if (!error.exist) {
+                strcat (cMiListaTipo,ctipoDocumento);
+                strcat (cMiListaTipo,"|");
+                strcat (cMiListaNumero,cnumeroDocumento);
+                strcat (cMiListaNumero,"|");
+            }
+	    }
+	    
+        if (!error.exist)
+        {
+        	char buffer[500+1]="";
+			sprintf(buffer,"SP - PAIS.PKG_INTEGRACION_MDW_WEB.SP_DEUDA_IMPUTACION_DETALLE");
+			writeLog_STR( INFORM, serviceName, buffer, 0, tid );
+
+			
+			
+            EXEC SQL AT :DBName EXECUTE
+            	DECLARE
+                    lst                         PAIS.TIPO_NUMERO_doc_TABLE;
+                    undoc                       PAIS.TIPO_NUMERO_doc_TYPE;
+                    num                         number;
+                    i                           number;
+                    cantTipo                    number;
+                    numero                      VARCHAR2(40);
+                    tipo                        VARCHAR2(40);
+                    
+                    cSQLclaseComprobante        VARCHAR2(1);      
+                    cSQLsucursalComprobante     VARCHAR2(4);   
+                    cSQLnumeroComprobante       VARCHAR2(8);
+                    cSQLfechaVigencia           VARCHAR2(25);
+                    cSQLfechaVto                VARCHAR2(25);
+                    cSQLfechaCorte              VARCHAR2(25);
+                    lSQLcustomerId              NUMBER;
+                    cSQLtipoOperacion           VARCHAR2(5);
+                    lSQLcustomerIdResp          NUMBER;           
+                    cSQLtipoDocumentoUltimo     VARCHAR2(20);
+                    cSQLnumDocum                VARCHAR2(30);
+                    lSQLcustomerIdCliente       NUMBER;
+                    cSQLultimoNroComprobante    VARCHAR2(20);                                                            //
+                    cSQLfechaVtoFact            VARCHAR2(25);
+                    lSQLfactura                 NUMBER;                  
+                    
+                BEGIN
+                lst := PAIS.tipo_numero_doc_table ();                                                                                             // se agrego prefijo
+                
+   				IF ( :cclaseComprobante = '' ) THEN
+					cSQLclaseComprobante := NULL;
+				ELSE
+					cSQLclaseComprobante := :cclaseComprobante;
+				END IF;
+   				
+   				IF ( :csucursalComprobante = '' ) THEN
+					cSQLsucursalComprobante := NULL;
+				ELSE
+					cSQLsucursalComprobante := :csucursalComprobante;
+				END IF;
+   				
+   				IF ( :cnumeroComprobante = '' ) THEN
+					cSQLnumeroComprobante := NULL;
+				ELSE
+					cSQLnumeroComprobante := :cnumeroComprobante;
+				END IF;
+   				
+   				IF ( :cfechaVigencia = '' ) THEN
+					cSQLfechaVigencia := NULL;
+				ELSE
+					cSQLfechaVigencia := :cfechaVigencia;
+				END IF;
+   				IF ( :cfechaVto = '' ) THEN
+					cSQLfechaVto := NULL;
+				ELSE
+					cSQLfechaVto := :cfechaVto;
+				END IF;
+				
+   				IF ( :cfechaCorte = '' ) THEN
+					cSQLfechaCorte := NULL;
+				ELSE
+					cSQLfechaCorte := :cfechaCorte;
+				END IF;
+				
+				IF ( :lcustomerId = 0 ) THEN
+					lSQLcustomerId := NULL;
+				ELSE
+					lSQLcustomerId := :lcustomerId;
+				END IF;	
+   				IF ( :ccodigoMoneda = '' ) THEN
+					cSQLtipoOperacion := NULL;
+				ELSE
+					cSQLtipoOperacion := :ccodigoMoneda;
+				END IF;
+				IF ( :lcustomerIdResp = 0 ) THEN
+					lSQLcustomerIdResp := NULL;
+				ELSE
+					lSQLcustomerIdResp := :lcustomerIdResp;
+				END IF;	
+
+                IF ( :ctipoDocumentoUltimo = '' ) THEN
+					cSQLtipoDocumentoUltimo := NULL;
+				ELSE
+					cSQLtipoDocumentoUltimo := :ctipoDocumentoUltimo;
+				END IF;	
+
+                IF ( :cnumDocum = '' ) THEN
+					cSQLnumDocum := NULL;
+				ELSE
+					cSQLnumDocum := :cnumDocum;
+				END IF;	
+				
+				IF ( :lcustomerIdCliente = 0 ) THEN
+					lSQLcustomerIdCliente := NULL;
+				ELSE
+					lSQLcustomerIdCliente := :lcustomerIdCliente;
+				END IF;	
+				
+				IF ( :cultimoNroComprobante = '' ) THEN
+					cSQLultimoNroComprobante := NULL;
+				ELSE
+					cSQLultimoNroComprobante := :cultimoNroComprobante;
+				END IF;	
+				
+				IF ( :cfechaVtoFact = 0 ) THEN
+					cSQLfechaVtoFact := NULL;
+				ELSE
+					cSQLfechaVtoFact := :cfechaVtoFact;
+				END IF;	
+				
+				IF ( :cfactura = '' ) THEN
+					lSQLfactura := NULL;
+				ELSE
+					lSQLfactura := :lfactura;
+				END IF;	
+
+				
+				
+                if (length (:cMiListaTipo) >= 1) then
+                    cantTipo :=0;
+                    for i in 1..length (:cMiListaTipo) loop
+                        if (substr(:cMiListaTipo, i, 1) = '|') then
+                            cantTipo := cantTipo + 1;
+                        end if;
+                    end loop;
+
+                        for num in 1..cantTipo loop
+                            tipo   := substr(:cMiListaTipo, num, instr(:cMiListaTipo, '|') -1);
+                            numero := substr(:cMiListaNumero, num, instr(:cMiListaNumero, '|') -1);
+
+                            if (length(:cMiListaTipo) - length(tipo) > 1) then
+                                :cMiListaTipo   := substr(:cMiListaTipo,instr(:cMiListaTipo, '|')+1);
+                                :cMiListaNumero := substr(:cMiListaNumero,instr(:cMiListaNumero, '|')+1);
+                            end if;
+                                
+                            lst.extend();
+                            lst(num):=PAIS.TIPO_NUMERO_doc_TYPE(tipo,numero);
+                        end loop;
+                else
+                    lst := NULL;
+                end if;
+                
+   				IF ( :ctipoDocumentoUltimo = '' ) THEN
+					undoc := NULL;
+                else
+                    undoc := PAIS.TIPO_NUMERO_doc_TYPE(cSQLtipoDocumentoUltimo,cSQLnumDocum);
+				END IF;
+				
+				
+                PAIS.PKG_INTEGRACION_MDW_WEB.SP_DEUDA_IMPUTACION_DETALLE( lst,
+                :ctipoComprobante,
+                :ctipoCambio,
+                :lcantidadItems,
+                cSQLclaseComprobante,
+                cSQLsucursalComprobante,
+                cSQLnumeroComprobante,
+                cSQLfechaVigencia,
+                cSQLfechaVto,
+                cSQLfechaCorte,
+                lSQLcustomerId,
+                cSQLtipoOperacion,
+                undoc,
+                lSQLcustomerIdCliente,
+                cSQLultimoNroComprobante,
+                cSQLfechaVtoFact,
+                lSQLfactura,
+                :lcantidadTotal:indlcantidadTotal,
+                :lcantidadPagina:indlcantidadPagina,
+                :cursorParam, 
+                :cresultadoOperacion:indresultadoOperacion,
+                :nCodeError:indCodError,
+                :cDescError:indDescError);				
+                
+                
+                END;
+            END-EXEC;
+        }
+
+
+        
+        /*--- Service Logic (Before) ---*/
+
+        /*--- Execute Data Base Operation ---*/
+
+        if (!error.exist && sqlca.sqlcode  ) {
+            if(sqlca.sqlcode==-3114 || sqlca.sqlcode==-1012 || sqlca.sqlcode==-3113)
+            {
+                undoConnectBD();
+                doConnectBDenc ( globalArgc, globalArgv );
+                tpforward (serviceName, (char *)fdata,0,0);
+            }
+            setErrMsg(&error, ERR_TECNICO, "Falla QUERY-getDeudaImputacionDetalleTux(sp_obtener_domicilios)");
+            writeLog_STR( ERRORMSG, serviceName, sqlca.sqlerrm.sqlerrmc, error.code, tid);
+        }
+
+        /*--- Service Logic (After) ---*/
+        fnszAllTrim(cDescError);
+        fnszAllTrim(cresultadoOperacion);
+        
+        
+        // levanto los dos parametros...
+        if(!indlcantidadTotal)
+		if (!error.exist && Fchg32((FBFR32 *)fdataOut, CANTIDAD_TOTAL , 0, (char *)&lcantidadTotal, 0L) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvBSCS(validateFactPortOutPOSPAGO): Falla de Fchg-CANTIDAD_TOTAL");
+        }
+
+        if(!indlcantidadPagina)
+		if (!error.exist && Fchg32((FBFR32 *)fdataOut, CANTIDAD_PAGINA , 0, (char *)&lcantidadPagina, 0L) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvBSCS(validateFactPortOutPOSPAGO): Falla de Fchg-CANTIDAD_PAGINA");
+        }
+        
+        if(!indresultadoOperacion)
+		if (!error.exist && Fchg32((FBFR32 *)fdataOut, RESULTADO_OPERACION , 0, (char *)&cresultadoOperacion, 0L) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvBSCS(validateFactPortOutPOSPAGO): Falla de Fchg-RESULTADO_OPERACION");
+        }
+        if(!indDescError)
+        if (Fchg32((FBFR32 *)fdataOut, DESC_ERROR , 0, (char *)cDescError, 0L) == -1) {
+        	setErrMsg(&error, ERR_TECNICO, "Error Tecnico - srvVMIQuery(getSerializedProductDataVMI): Falla de Fchg-CODE_ERROR");
+        }
+
+        
+
+        /*--- Populate Data on Buffer ---*/
+            //Si el sp devolvio un error funcional, lo aclaro y voy por success
+            if(!error.exist && (nCodeError != 0) ){
+                setErrMsg(&error, nCodeError, cDescError);
+            }
+
+            if (!error.exist)
+            {
+            
+            ccodigoMoneda[0]='$';
+            ccodigoMoneda[1]=0;
+            
+            do {
+            
+                EXEC SQL FETCH :cursorParam INTO 
+                    :ctipoDocumento,
+                    :cnumeroDocumento,
+                    :lcustomerIdResp,
+                    :ldigitoVerificadorRp,
+                    :ctipoComprobante,
+                    :cclaseComprobante,
+                    :csucursalComprobante,
+                    :cnumeroComprobanteStr,
+                    :csubtipoDocumento,
+                    :cfechaVto,
+                    :ccodigoMoneda,
+                    :fimporte,
+                    :fimporteMonedaOrigen:op_importeMonedaOrigen,         
+                    :fimportePes:op_importePes,                  
+                    :fimporteFechaCot:op_importeFechaCot,             
+                    :fsaldoActual:op_saldoActual,                 
+                    :fsaldoFechaEmision:op_saldoFechaEmision,           
+                    :fsaldoFechaCotizacion:op_saldoFechaCotizacion,        
+                    :cestCodEst:op_estCodEst,
+                    :cmarcaMigradoDeimos,    
+                    :ctasaCero,     
+                    :lDiasGracia,      
+                    :cfechaCalculada,
+                    :ltipoMarcaAdhesion,
+                    :cmarcaAdhesion,
+                    :cmarcaReclamo,
+                    :ftipoCambioFechaEmi,
+                    :ftipoCambioFechaCot,
+                    :cfechaCreacion,
+                    :lnroInternoFactura;
+
+//            ccodigoMoneda[0]='$';
+//            ccodigoMoneda[1]=0;
+                    
+                    
+                    // si los opcionales no estan, se asegura de setearlos a cero (especificado en el servicio tux)
+                    if (op_importeMonedaOrigen)     fimporteMonedaOrigen=0;
+                    if (op_importePes)              fimportePes=0;
+                    if (op_importeFechaCot)         fimporteFechaCot=0;
+                    if (op_saldoActual)             fsaldoActual=0;
+                    if (op_saldoFechaEmision)       fsaldoFechaEmision=0;
+                    if (op_saldoFechaCotizacion)    fsaldoFechaCotizacion=0;
+
+                    fnszAllTrim(ctipoDocumento);
+                    fnszAllTrim(cnumeroDocumento);
+                    fnszAllTrim(ctipoComprobante);
+                    fnszAllTrim(cclaseComprobante);
+                    fnszAllTrim(csucursalComprobante);
+                    fnszAllTrim(cnumeroComprobanteStr);
+                    fnszAllTrim(csubtipoDocumento);
+                    fnszAllTrim(cfechaVto);
+                    fnszAllTrim(ccodigoMoneda);
+                    fnszAllTrim(cestCodEst);
+                    fnszAllTrim(cmarcaMigradoDeimos);
+                    fnszAllTrim(ctasaCero);
+                    fnszAllTrim(cfechaCalculada);
+                    fnszAllTrim(cmarcaAdhesion);
+                    fnszAllTrim(cmarcaReclamo);
+                    fnszAllTrim(cfechaCreacion);
+                    
+                //chequeo Errores
+                 if (!error.exist && sqlca.sqlcode && sqlca.sqlcode == NO_HAY_REGISTROS)
+                    break;
+    
+                if (!error.exist && sqlca.sqlcode && sqlca.sqlcode != NO_HAY_REGISTROS) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla QUERY-Cursor");
+                    writeLog_STR(ERRORMSG,serviceName,sqlca.sqlerrm.sqlerrmc,sqlca.sqlcode, tid);
+                }
+
+                fnszAllTrim(ctipoDocumento);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, TIPO_DOCUMENTO, (char *)&ctipoDocumento, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-TIPO_DOCUMENTO");
+                }
+
+                fnszAllTrim(cnumeroDocumento);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, NUMERO_DOCUMENTO, (char *)&cnumeroDocumento, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-NUMERO_DOCUMENTO");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, CUSTOMER_ID_RESP, (char *)&lcustomerIdResp, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-CUSTOMER_ID_RESP");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, DIGITO_VERIFICADOR_RP, (char *)&ldigitoVerificadorRp, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-DIGITO_VERIFICADOR_RP");
+                }
+
+                fnszAllTrim(ctipoComprobante);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, TIPO_COMPROBANTE, (char *)&ctipoComprobante, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-TIPO_COMPROBANTE");
+                }
+
+                fnszAllTrim(cclaseComprobante);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, CLASE_COMPROBANTE, (char *)&cclaseComprobante, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-CLASE_COMPROBANTE");
+                }
+
+                fnszAllTrim(csucursalComprobante);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, SUCURSAL_COMPROBANTE, (char *)&csucursalComprobante, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-SUCURSAL_COMPROBANTE");
+                }
+                
+                fnszAllTrim(cnumeroComprobanteStr);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, NUMERO_COMPROBANTE_STR, (char *)&cnumeroComprobanteStr, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-NUMERO_COMPROBANTE_STR");
+                }
+                
+                fnszAllTrim(csubtipoDocumento);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, SUBTIPO_DOCUMENTO, (char *)&csubtipoDocumento, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-SUBTIPO_DOCUMENTO");
+                }
+                
+                fnszAllTrim(cfechaVto);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, FECHA_VTO_HASTA, (char *)&cfechaVto, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-FECHA_VTO");
+                }
+                
+                fnszAllTrim(ccodigoMoneda);
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, COD_MONEDA, (char *)&ccodigoMoneda, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-COD_MONEDA");
+                }
+
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, IMPORTE, (char *)&fimporte, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-IMPORTE");
+                }
+
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, IMPORTE_MONEDA_ORIGEN, (char *)&fimporteMonedaOrigen, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-IMPORTE_MONEDA_ORIGEN");
+                }
+
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, IMPORTE_PES, (char *)&fimportePes, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-IMPORTE_PES");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, IMPORTE_FECHA_COT, (char *)&fimporteFechaCot, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-IMPORTE_FECHA_COT");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, SALDO_ACTUAL, (char *)&fsaldoActual, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-SALDO_ACTUAL");
+                }
+
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, SALDO_FECHA_EMISION, (char *)&fsaldoFechaEmision, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-SALDO_FECHA_EMISION");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, SALDO_FECHA_COTIZACION, (char *)&fsaldoFechaCotizacion, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-SALDO_FECHA_COTIZACION");
+                }
+
+                fnszAllTrim(cestCodEst);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, EST_COD_ACT, (char *)&cestCodEst, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-EST_COD_ACT");
+                }
+
+                fnszAllTrim(cmarcaMigradoDeimos);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, MARCA_MIGRADO_DEIMOS, (char *)&cmarcaMigradoDeimos, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-MARCA_MIGRADO_DEIMOS");
+                }
+
+                fnszAllTrim(ctasaCero);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, TASA_CERO, (char *)&ctasaCero, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-TASA_CERO");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, DIAS_GRACIA, (char *)&lDiasGracia, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-DIAS_GRACIA");
+                }
+                
+                fnszAllTrim(cfechaCalculada);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, FECHA_CALCULADA, (char *)&cfechaCalculada, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-FECHA_CALCULADA");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, TIPO_MARCA_ADHESION, (char *)&ltipoMarcaAdhesion, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-TIPO_MARCA_ADHESION");
+                }
+                
+                fnszAllTrim(cmarcaAdhesion);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, MARCA_ADHESION, (char *)&cmarcaAdhesion, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-MARCA_ADHESION");
+                }
+                
+                fnszAllTrim(cmarcaReclamo);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, MARCA_RECLAMO, (char *)&cmarcaReclamo, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-MARCA_RECLAMO");
+                }
+
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, TIPO_CAMBIO_FECHA_EMI, (char *)&ftipoCambioFechaEmi, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-TIPO_CAMBIO_FECHA_EMI");
+                }
+
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, TIPO_CAMBIO_FECHA_COT, (char *)&ftipoCambioFechaCot, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-TIPO_CAMBIO_FECHA_COT");
+                }
+                
+                fnszAllTrim(cfechaCreacion);
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, FECHA_CREACION, (char *)&cfechaCreacion, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-FECHA_CREACION");
+                }
+                
+                if (!error.exist && Fadd32((FBFR32 *)fdataOut, NRO_INTERNO_FACTURA, (char *)&lnroInternoFactura, 0) == -1) {
+                    setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fadd-NRO_INTERNO_FACTURA");
+                }
+            }while(!error.exist);
+    
+            }
+
+            EXEC SQL CLOSE :cursorParam;
+            
+            if (nCodeError > 18) nCodeError = 999;
+                        
+            if (!error.exist && Fchg32((FBFR32 *)fdataOut, CODE_ERROR , 0, (char *)&nCodeError, 0L) == -1) {
+                setErrMsg(&error, NRO_ERROR_TECNICO, "Error Tecnico - srvBSCS(getDeudaImputacionDetalleTux): Falla de Fchg-CODE_ERROR");
+            }
+            
+            if( error.exist ){
+                EXEC SQL AT :DBName ROLLBACK;
+                loadError(error.descr, error.code, (char *)fdataOut );
+                writeLog_STR( ERRORMSG, serviceName,error.descr,  error.code, tid);
+                tpreturn(TPFAIL, 0,(char *)fdataOut, 0L, 0);
+            }
+        
+            EXEC SQL AT :DBName COMMIT;
+        
+        writeLog_STR( INFORM, serviceName, "Operacion exitosa", 0, tid);
+
+        /*--- Deallocate Memory and Return Buffer ---*/
+        tpreturn(TPSUCCESS, 0, (char *)fdataOut, 0L, 0);
+}

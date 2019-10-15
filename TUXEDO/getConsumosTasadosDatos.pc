@@ -1,0 +1,129 @@
+#if defined(__STDC__)||defined(__cplusplus)
+void getConsumosTasadosDatos(TPSVCINFO *msg)
+#else
+void getConsumosTasadosDatos(msg)
+TPSVCINFO *msg;
+#endif
+{
+    /*--- Local Oracle Variables Definition ---*/
+    char serviceName[]="getConsumosTasadosDatos";
+    
+    EXEC SQL BEGIN DECLARE SECTION;
+    char tid[100+1] = "";
+    //IN
+    long lnumContrato=0L;                   //  NUM_CONTRATO
+    char cfechaDesde[21+1] = "";		    //	FECHA_DESDE
+    char cfechaHasta[21+1] = "";	        //	FECHA_HASTA
+    //OUT
+    long  lvolumenDatos=0L;			        //  VOLUMEN_DATOS
+    float fmonto = 0.0;                     //  MONTO
+    long nCodeError=0;
+    char cDescError[500 + 1]= "";
+    short indCodError;
+    short indDescError;
+    EXEC SQL END DECLARE SECTION;
+
+    /*--- Socket Variables Definition ---*/ 
+    errorType error;
+    /*--- Local Tuxedo FML Variables Definition ---*/
+    FBFR32   *fdata;
+    FLDLEN32 len;        
+    FBFR32 *fdataOut;
+
+    /*--- Init Service with no errors ---*/
+    error.exist = FALSE;
+    /*--- Local Tuxedo FML Variables Definition and init TRANS_ID ---*/
+    fdata=(FBFR32 *)msg->data;
+    strcpy(tid, getTID(fdata));
+    if ( !error.exist && ((fdataOut=(FBFR32 *)tpalloc("FML32", NULL, 1024*1000)) == NULL) ) {
+        loadError("Falla de tpalloc", ERR_TECNICO, (char *)fdata);
+        writeLog_STR(ERRORMSG,serviceName, Fstrerror32(Ferror32), Ferror32, tid);
+        tpreturn(TPFAIL, 0, (char *)fdata, 0L, 0);
+    }
+    Finit32(fdataOut, Fsizeof32(fdataOut));
+    if (!error.exist && Fchg32((FBFR32 *)fdataOut, TRANS_ID , 0, (char *)&tid, 0L) == -1) {
+        setErrMsg(&error, ERR_TECNICO, "srvRTPAIS(getConsumosTasadosDatos): Falla de Fchg-TRANS_ID");
+    }
+    /*--- Read data from buffer ---*/
+    if ( !error.exist && validateFMLRequest(fdata, 3, NUM_CONTRATO, FECHA_DESDE, FECHA_HASTA) ) {
+        setErrMsg(&error, ERR_VAL_PARAMS, "srvRTPAIS(getConsumosTasadosDatos): Faltan parametros");
+    }
+    len=sizeof(lnumContrato);
+    if (!error.exist && Fget32(fdata, NUM_CONTRATO, 0, (char *)&lnumContrato, &len) == -1) {
+        setErrMsg(&error, ERR_TECNICO, "srvRTPAIS(getConsumosTasadosDatos): Falla de Fget-NUM_CONTRATO");
+    }
+    len=sizeof(cfechaDesde);
+    if (!error.exist && Fget32(fdata, FECHA_DESDE, 0, (char *)&cfechaDesde, &len) == -1) {
+        setErrMsg(&error, ERR_TECNICO, "srvRTPAIS(getConsumosTasadosDatos): Falla de Fget-FECHA_DESDE");
+    }
+    len=sizeof(cfechaHasta);
+    if (!error.exist && Fget32(fdata, FECHA_HASTA, 0, (char *)&cfechaHasta, &len) == -1) {
+        setErrMsg(&error, ERR_TECNICO, "srvRTPAIS(getConsumosTasadosDatos): Falla de Fget-FECHA_HASTA");
+    }
+    /*--- Service Logic (Before) ---*/
+    /*--- Execute Data Base Operation ---*/	    
+    if (!error.exist)
+    {
+        char buffer[500+1]="";
+        sprintf(buffer,"SP - RTPAIS.PKG_CONSUMOS_TAS_WEB.SP_CONSULTAR_DATOS_TAS_ROAM_WEB");
+        writeLog_STR( INFORM, serviceName, buffer, 0, tid );
+
+        EXEC SQL AT :DBName EXECUTE
+            DECLARE
+                
+            BEGIN
+    
+            RTPAIS.PKG_CONSUMOS_TAS_WEB.SP_CONSULTAR_TASADOS_WEB(
+            :lnumContrato,
+            :cfechaDesde, 
+            :cfechaHasta,
+            :lvolumenDatos,
+            :fmonto,
+            :nCodeError:indCodError,
+            :cDescError:indDescError);
+
+            END;
+        END-EXEC;
+    }
+
+    if (!error.exist && sqlca.sqlcode  ) {
+        if(sqlca.sqlcode==-3114 || sqlca.sqlcode==-1012 || sqlca.sqlcode==-3113)
+        {
+            undoConnectBD();
+            doConnectBDenc ( globalArgc, globalArgv );
+            tpforward (serviceName, (char *)fdata,0,0);
+        }
+        setErrMsg(&error, ERR_TECNICO, "Falla QUERY-getConsumosTasadosDatos(sp_XXXXXXX)");
+        writeLog_STR( ERRORMSG, serviceName, sqlca.sqlerrm.sqlerrmc, error.code, tid);
+    }
+    /*--- Populate Data on Buffer ---*/
+    if (!error.exist && Fchg32((FBFR32 *)fdataOut, VOLUMEN_DATOS , 0, (char *)&lvolumenDatos, 0L) == -1) {
+        setErrMsg(&error, ERR_TECNICO, "srvRTPAIS(getConsumosTasadosDatos): Falla de Fchg-VOLUMEN_DATOS");
+    }
+    if (!error.exist && Fchg32((FBFR32 *)fdataOut, MONTO , 0, (char *)&fmonto, 0L) == -1) {
+        setErrMsg(&error, ERR_TECNICO, "srvRTPAIS(getConsumosTasadosDatos): Falla de Fchg-MONTO");
+    }
+    if(!indCodError) {
+        if (!error.exist && Fchg32((FBFR32 *)fdataOut, CODE_ERROR , 0, (char *)&nCodeError, 0L) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "srvRTPAIS(getConsumosTasadosDatos): Falla de Fchg-CODE_ERROR");
+        }
+    }
+    if(!indDescError) {
+        fnszAllTrim(cDescError);
+        if (Fchg32((FBFR32 *)fdataOut, DESC_ERROR , 0, (char *)cDescError, 0L) == -1) {
+            setErrMsg(&error, ERR_TECNICO, "Error Tecnico - srvVMIQuery(getConsumosTasadosDatos): Falla de Fchg-CODE_ERROR");
+        }
+    }
+    if( error.exist ){
+        EXEC SQL AT :DBName ROLLBACK;
+        loadError(error.descr, error.code, (char *)fdataOut );
+        writeLog_STR( ERRORMSG, serviceName,error.descr,  error.code, tid);
+        tpreturn(TPFAIL, 0,(char *)fdataOut, 0L, 0);
+    }
+
+    EXEC SQL AT :DBName COMMIT;
+    writeLog_STR( INFORM, serviceName, "Operacion exitosa", 0, tid);
+
+    /*--- Deallocate Memory and Return Buffer ---*/
+    tpreturn(TPSUCCESS, 0, (char *)fdataOut, 0L, 0);
+}
